@@ -1,0 +1,14 @@
+Package: ValueWithUncertainty
+Title: Value with associated uncertainty represented by Upper and Lower CI. 
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Michael",
+           family = "Green",
+           role = c("aut", "cre"),
+           email = "github@ftt6283.org"
+Description: This package has objects and functions for managing the values and uncertainty. It allows the values to be fixed or random.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
