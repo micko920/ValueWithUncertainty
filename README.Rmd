@@ -25,7 +25,7 @@ The goal of ValueWithUncertainty is to ...
 You can install the released version of ValueWithUncertainty from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
-install.packages("ValueWithUncertainty")
+devtools::install_github("micko920/ValueWithUncertainty")
 ```
 
 ## Example
