@@ -1,5 +1,9 @@
 #' Pipe operator
+#' 
+#' Description Goes HERE
 #'
+#' @references [TBC - ERPD citation - Section 8.3.4.1]
+#' 
 #' See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
 #'
 #' @name %>%

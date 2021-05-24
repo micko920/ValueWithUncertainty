@@ -4,7 +4,7 @@
 \alias{ValueWithUncertainty}
 \title{ValueWithUncertainty}
 \usage{
-ValueWithUncertainty(p, digits = 3)
+ValueWithUncertainty(LowerCI, Value, UpperCI, model = as.numeric, fixed = TRUE)
 }
 \arguments{
 \item{p}{A value to report}
@@ -17,10 +17,13 @@ Returns string of the value \code{p}
 Returns p with \code{digits} decimal places
 }
 \description{
-\code{ValueWithUncertainty} does something.
+\code{ValueWithUncertainty} returns an object which represents a value with a CI
 }
 \examples{
+tbc
 
-ValueWithUncertainty(1) # returns "1.000"
-
+ValueWithUncertainty(1) # returns object
+}
+\references{
+\link{TBC}
 }

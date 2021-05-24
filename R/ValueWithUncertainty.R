@@ -1,6 +1,6 @@
 #' ValueWithUncertainty
 #'
-#' `ValueWithUncertainty` does something.
+#' `ValueWithUncertainty` returns an object which represents a value with a CI
 #'
 #' @param p A value to report
 #' @return Returns string of the value \code{p}
@@ -8,29 +8,65 @@
 #' @return Returns p with \code{digits} decimal places
 #' @examples
 #'
-#' ValueWithUncertainty(1) # returns "1.000"
-#'
+#' ValueWithUncertainty(1) # returns object
 #' @export
-
-ValueWithUncertainty <- function(p, digits = 3) {
-  if (p < 0) stop("p cannot be less than 0")
-  if (p > 1) stop("p cannot be greater than 1")
-
-  if (!(digits %in% 1:5)) {
-    warning("digits should probably be an integer between 1 and 5")
-    digits = 3
+ValueWithUncertainty <- function(LowerCI, Value, UpperCI, model = as.numeric, fixed = TRUE) {
+  if (!is.numeric(Value)) stop("Value must be numeric", call. = FALSE)
+  if (!is.numeric(LowerCI)) stop("LowerCI must be numeric", call. = FALSE)
+  if (!is.numeric(UpperCI)) stop("UpperCI must be numeric", call. = FALSE)
+  if (LowerCI > Value) stop("LowerCI must be lower than Value", call. = FALSE)
+  if (UpperCI < Value) stop("UpperCI must be higher than Value", call. = FALSE)
+  v <- as.numeric(Value)
+  if (inherits(Value, "ValueWithUncertainty")) {
+    v <- attr(Value, "value")
   }
+  new_obj <- structure(v,
+    value = v,
+    lci = LowerCI, uci = UpperCI, model = model,
+    fixed = fixed, class = "ValueWithUncertainty"
+  )
+  return(new_obj)
+}
 
-  if (p < .001) return("p < .001")
+#' @export
+ValueWithUncertaintyValue <- function(x) UseMethod("ValueWithUncertaintyValue")
 
-  p_round <- round(p, digits) %>%
-    as.character() %>%
-    # omit leading zero for APA-style
-    stringr::str_replace("0.", ".") %>%
-    # pad right with zeros
-    stringr::str_pad(digits+1, "right", 0)
+#' @export
+ValueWithUncertaintyValue.ValueWithUncertainty <- function(x) attr(x, "value")
 
-  p_string <- paste("p =", p_round)
 
-  return(p_string)
+#' @export
+ValueWithUncertaintyMax <- function(x) UseMethod("ValueWithUncertaintyMax")
+
+#' @export
+ValueWithUncertaintyMax.ValueWithUncertainty <- function(x) attr(x, "uci")
+
+#' @export
+ValueWithUncertaintyMin <- function(x) UseMethod("ValueWithUncertaintyMin")
+
+#' @export
+ValueWithUncertaintyMin.ValueWithUncertainty <- function(x) attr(x, "lci")
+
+#' @export
+ValueWithUncertaintyModel <- function(x) UseMethod("ValueWithUncertaintyModel")
+
+#' @export
+ValueWithUncertaintyModel.ValueWithUncertainty <- function(x) attr(x, "model")
+
+#' @export
+ValueWithUncertaintySampled <- function(x) UseMethod("ValueWithUncertaintySampled")
+
+#' @export
+ValueWithUncertaintySampled <- function(x) {
+  attr(x, "fixed") <- FALSE
+  return(x)
+}
+
+#' @export
+ValueWithUncertaintyFixed <- function(x) UseMethod("ValueWithUncertaintyFixed")
+
+#' @export
+ValueWithUncertaintyFixed <- function(x) {
+  attr(x, "fixed") <- TRUE
+  return(x)
 }

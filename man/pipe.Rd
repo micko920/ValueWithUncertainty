@@ -15,6 +15,11 @@ lhs \%>\% rhs
 The result of calling \code{rhs(lhs)}.
 }
 \description{
+Description Goes HERE
+}
+\references{
+\link{TBC - ERPD citation - Section 8.3.4.1}
+
 See \code{magrittr::\link[magrittr:pipe]{\%>\%}} for details.
 }
 \keyword{internal}
