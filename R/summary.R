@@ -1,15 +1,16 @@
-#' Value With Uncertainty Summary 
-#' 
+#' Value With Uncertainty Summary
+#'
 #' Summary of Value with Uncertainty Export Functions
 #'
-#' @references [TBC] 
-#'  
+#' @references [TBC]
+#'
 #' @rdname groupGeneric.ValueWithUncertainty
 #'
 #' @details \subsection{\code{Summary}}{
 #' The methods \code{all} and \code{any} are not supported for \code{ValueWithUncertainty}
 #' objects and fail with an informative message. \code{min}, \code{max} (and
 #' \code{range}) return the minimum or (and) maximum of the CI
+#' }
 #'
 #' @examples
 #' c(min(x), max(x))

@@ -20,10 +20,6 @@ Returns p with \code{digits} decimal places
 \code{ValueWithUncertainty} returns an object which represents a value with a CI
 }
 \examples{
-tbc
 
 ValueWithUncertainty(1) # returns object
-}
-\references{
-\link{TBC}
 }

@@ -29,7 +29,11 @@ numeric values.
 Any \code{ValueWithUncertainty} operand is automatically coerced to numeric
 with no uncertainty.}
 
-
+\subsection{\code{Summary}}{
+The methods \code{all} and \code{any} are not supported for \code{ValueWithUncertainty}
+objects and fail with an informative message. \code{min}, \code{max} (and
+\code{range}) return the minimum or (and) maximum of the CI
+}
 }
 \examples{
 y <- ValueWithUncertainty(1, 10, 100)

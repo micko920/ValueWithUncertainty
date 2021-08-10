@@ -70,3 +70,26 @@ ValueWithUncertaintyFixed <- function(x) {
   attr(x, "fixed") <- TRUE
   return(x)
 }
+
+
+##### Value Models #####
+
+
+#' @export
+vwuNorm <- function(v, n, ...) {
+  sd <- (diff(range(v)) / (2 * qnorm(p = QUCI))) # LCI,UCI are 90% QCI (5%,95%)
+  return(rnorm(n, mean = ValueWithUncertaintyValue(v), sd = sd))
+}
+
+#' @export
+vwuTriangle <- function(v, n, ...) {
+  return(rtriangle(n = n, theta = ValueWithUncertaintyValue(v), lower = min(v), upper = max(v)))
+}
+
+#' @export
+create_vwuSampled <- function(value_samples) {
+  return(function(v, n, ...) {
+    return(sample(value_samples, size = n, replace = TRUE))
+  })
+}
+
