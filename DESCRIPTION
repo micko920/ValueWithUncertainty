@@ -1,6 +1,6 @@
 Package: ValueWithUncertainty
 Title: Value with associated uncertainty represented by Upper and Lower CI
-Version: 0.0.0.9001
+Version: 1.0.0
 Authors@R:
     person(given = "Michael",
            family = "Green",
