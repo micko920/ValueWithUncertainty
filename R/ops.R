@@ -1,9 +1,9 @@
 #' Ops Value with Uncertainty
-#' 
+#'
 #' Ops
 #'
 #' @references [TBC]
-#' 
+#'
 #' @param e1 Parameter definition tbc
 #' @param e2 Parameter definition tbc
 #' @return tbc output from function
@@ -40,7 +40,6 @@ Ops.ValueWithUncertainty <- function(e1, e2) {
 
   if (!missing(e2)) {
     if (inherits(e2, "ValueWithUncertainty")) {
-      # warn_once_coercion("Ops")
       e2 <- gen_sample(e2, fixed = attr(e2, "fixed"))
     }
   }

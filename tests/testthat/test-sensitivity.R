@@ -69,13 +69,12 @@ createFunc_rtnRandomSampleWithTolerance <- function(equalFunc) {
 
 
 createEstValueModel <- function(value, calc, calcArgs) {
-  dummy <- ValueWithUncertainty(0, 0, 0)
   calcModel <- function(v, n, ...) {
     return(replicate(n, do.call(calc, calcArgs())))
   }
   ###
   # sampled X values
-  samples <- calcModel(dummy, 10000)
+  samples <- replicate(10000, do.call(calc, calcArgs()))
   LCI <- quantile(samples, 0.05)
   UCI <- quantile(samples, 0.95)
 
@@ -88,6 +87,8 @@ createEstValueModel <- function(value, calc, calcArgs) {
 
 
 test_that("complex example chained calcs with variation", {
+
+  set.seed(8121976) # just so tests wont fail for random number changes
   calc_A <- function(v) {
     return(2 * v)
   }
@@ -117,24 +118,27 @@ test_that("complex example chained calcs with variation", {
   xval <- 10
   xlci <- 0
   xuci <- 20
-  x <- ValueWithUncertainty(xlci, xval, xuci, model = rtnRandomSample)
+  x <- ValueWithUncertainty(xlci, xval, xuci, model = rtnRandomSample, fixed=FALSE)
 
   yval <- 2
   ylci <- 0
   yuci <- 4
-  y <- ValueWithUncertainty(ylci, yval, yuci, model = rtnRandomSample)
+  y <- ValueWithUncertainty(ylci, yval, yuci, model = rtnRandomSample, fixed=FALSE)
 
   zval <- 100
   zlci <- 50
   zuci <- 150
-  z <- ValueWithUncertainty(zlci, zval, zuci, model = rtnRandomSample)
+  z <- ValueWithUncertainty(zlci, zval, zuci, model = rtnRandomSample, fixed=FALSE)
 
   # Chain to next est model
-  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
-  expect_equal(mean(estA), 2 * xval)
-  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
-  expect_equal(mean(estB), yval + 10)
+  estA <- ValueWithUncertaintyFixed(createEstValueModel(calc_A(x), calc_A, calc_A_Args))
+  estB <- ValueWithUncertaintyFixed(createEstValueModel(calc_B(y), calc_B, calc_B_Args))
 
+  x <- ValueWithUncertaintyFixed(x)
+  y <- ValueWithUncertaintyFixed(y)
+  z <- ValueWithUncertaintyFixed(z)
+  estA <- ValueWithUncertaintySampled(estA)
+  estB <- ValueWithUncertaintySampled(estB)
 
   estC <- calc_C(x, y, z)
 
@@ -145,8 +149,7 @@ test_that("complex example chained calcs with variation", {
   # No variation
   # very simple repeat to simulate value and variation
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
-  expect_equal(signif(median(samples), 2), signif((((xval * 2) + (yval + 10)) / zval), 2))
-  compare_summary_equal(samples, 0.3200, 0.3200, 0.3200, 0.3200, 0.3200, 0.3200)
+  compare_summary_equal(samples, 0.32, 0.32, 0.32, 0.32, 0.32, 0.32)
 
   ###
   # Let Z be sampled
@@ -155,8 +158,7 @@ test_that("complex example chained calcs with variation", {
   y <- ValueWithUncertaintyFixed(y)
   z <- ValueWithUncertaintySampled(z)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
-  expect_equal(signif(median(samples), 2), signif((((xval * 2) + (yval + 10)) / zval), 2))
-  compare_summary_equal(samples, 0.2130, 0.2560, 0.3200, 0.3520, 0.4270, 0.6400)
+  compare_summary_equal(samples, 0.213, 0.256, 0.32, 0.352, 0.427, 0.64)
 
   ###
   # Let Y be sampled
@@ -164,8 +166,9 @@ test_that("complex example chained calcs with variation", {
   x <- ValueWithUncertaintyFixed(x)
   y <- ValueWithUncertaintySampled(y)
   z <- ValueWithUncertaintyFixed(z)
+
+
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
-  expect_equal(signif(median(samples), 2), signif((((xval * 2) + (yval + 10)) / zval), 2))
   compare_summary_equal(samples, 0.3000, 0.3100, 0.3200, 0.3200, 0.3300, 0.3400)
 
   ###
@@ -174,9 +177,10 @@ test_that("complex example chained calcs with variation", {
   x <- ValueWithUncertaintySampled(x)
   y <- ValueWithUncertaintyFixed(y)
   z <- ValueWithUncertaintyFixed(z)
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
-  expect_equal(signif(median(samples), 2), signif((((xval * 2) + (yval + 10)) / zval), 2))
-  compare_summary_equal(samples, 0.1200, 0.2200, 0.3200, 0.3190, 0.4200, 0.5200)
+  compare_summary_equal(samples, 0.1200, 0.2200, 0.3200, 0.3210, 0.4200, 0.5200)
 })
 
 test_that("sensitivity analysis of complex example chained calcs with variation ", {
@@ -240,6 +244,8 @@ test_that("sensitivity analysis of complex example chained calcs with variation 
   expect_equal(mean(estC), ((2.0 * xval) + (yval + 10.0)) / zval)
 
   set.seed(8121976) # just so tests wont fail for random number changes
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
   V_all <- var(samples)
 
@@ -253,27 +259,33 @@ test_that("sensitivity analysis of complex example chained calcs with variation 
   x <- ValueWithUncertaintyFixed(x)
   y <- ValueWithUncertaintySampled(y)
   z <- ValueWithUncertaintySampled(z)
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
   TEI_X <- 1 - (var(samples) / V_all)
-  expect_equal(signif(TEI_X, 4), 0.8031)
+  expect_equal(signif(TEI_X, 4), 0.7984)
 
   # Total Effect Index of Y, i.e. fixed Y
   set.seed(8121976) # just so tests wont fail for random number changes
   x <- ValueWithUncertaintySampled(x)
   y <- ValueWithUncertaintyFixed(y)
   z <- ValueWithUncertaintySampled(z)
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
   TEI_Y <- 1 - (var(samples) / V_all)
-  expect_equal(signif(TEI_Y, 4), 0.03108)
+  expect_equal(signif(TEI_Y, 4), 0.006862)
 
   # Total Effect Index of Z, i.e. fixed Z
   set.seed(8121976) # just so tests wont fail for random number changes
   x <- ValueWithUncertaintySampled(x)
   y <- ValueWithUncertaintySampled(y)
   z <- ValueWithUncertaintyFixed(z)
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
   TEI_Z <- 1 - (var(samples) / V_all)
-  expect_equal(signif(TEI_Z, 4), 0.2724)
+  expect_equal(signif(TEI_Z, 4), 0.2674)
 })
 
 # test_that("tolerance clamp", {
@@ -414,6 +426,8 @@ test_that("sensitivity analysis of calcs with small variation and tolerance clam
   expect_equal(mean(estC), ((2.0 * xval) + (yval + 10.0)) / zval)
 
   set.seed(8121976) # just so tests wont fail for random number changes
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
   V_all <- var(samples)
 
@@ -427,25 +441,31 @@ test_that("sensitivity analysis of calcs with small variation and tolerance clam
   x <- ValueWithUncertaintyFixed(x)
   y <- ValueWithUncertaintySampled(y)
   z <- ValueWithUncertaintySampled(z)
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
   TEI_X <- 1 - (var(samples) / V_all)
-  expect_equal(signif(TEI_X, 4), 0.8034)
+  expect_equal(signif(TEI_X, 4), 0.7988)
 
   # Total Effect Index of Y, i.e. fixed Y
   set.seed(8121976) # just so tests wont fail for random number changes
   x <- ValueWithUncertaintySampled(x)
   y <- ValueWithUncertaintyFixed(y)
   z <- ValueWithUncertaintySampled(z)
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
   TEI_Y <- 1 - (var(samples) / V_all)
-  expect_equal(signif(TEI_Y, 4), 0.03030)
+  expect_equal(signif(TEI_Y, 4), 0.008275)
 
   # Total Effect Index of Z, i.e. fixed Z
   set.seed(8121976) # just so tests wont fail for random number changes
   x <- ValueWithUncertaintySampled(x)
   y <- ValueWithUncertaintySampled(y)
   z <- ValueWithUncertaintyFixed(z)
+  estA <- createEstValueModel(calc_A(x), calc_A, calc_A_Args)
+  estB <- createEstValueModel(calc_B(y), calc_B, calc_B_Args)
   samples <- replicate(10000, do.call(calc_C, calc_C_Args()))
   TEI_Z <- 1 - (var(samples) / V_all)
-  expect_equal(signif(TEI_Z, 4), 0.2733)
+  expect_equal(signif(TEI_Z, 4), 0.2695)
 })

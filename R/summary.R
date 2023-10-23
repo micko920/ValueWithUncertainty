@@ -28,9 +28,12 @@ Summary.ValueWithUncertainty <- function(..., na.rm = FALSE) {
       stop("method not supported for `ValueWithUncertainty` objects"),
     "sum" = NextMethod(),
     "prod" = NextMethod(),
+    #Max, Min and Range in this function are all getting overriden by the function calls lower down so ignore errors on lines 32 to 34
+    # nocov start
     "max" = ValueWithUncertaintyMax(x),
     "min" = ValueWithUncertaintyMin(x),
     "range" = range(ValueWithUncertaintyMin(x), ValueWithUncertaintyMax(x), na.rm = na.rm)
+    # nocov end
   )
 }
 

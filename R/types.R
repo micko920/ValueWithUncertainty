@@ -4,9 +4,16 @@
 #'
 #' @inheritParams base::as.numeric
 #'
-#' @examples
+#'
 #'
 
+#' @export
 as.double.ValueWithUncertainty <- function(x, ...) {
   return (gen_sample(x, fixed = attr(x, "fixed")))
 }
+
+#' @export
+as.numeric.ValueWithUncertainty <- function(x, ...) {
+  return (gen_sample(x, fixed = attr(x, "fixed")))
+}
+

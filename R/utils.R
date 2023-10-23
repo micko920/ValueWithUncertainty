@@ -12,23 +12,14 @@ warn_once_bool <- function(fun) warn_once(
   type = "bool"
 )
 
-warn_once_coercion <- function(fun) warn_once(
-  "non-'ValueWithUncertainty' operand automatically coerced to an 'ValueWithUncertainty' object with no uncertainty",
-  fun = "Ops",
-  type = "coercion"
-)
-
-#.v <- function(x) as.numeric(x)
-
-# get_exponent <- function(x) ifelse(.v(x), floor(log10(abs(.v(x)))), 0)
-
-# cummatrix <- function(x, fill=0) {
-#   t(sapply(seq_len(length(x)), function(lag) {
-#     c(rep(fill, lag-1), x[1:(length(x)-lag+1)])
-#   }))
-# }
-
-# cond2int <- function(...) {
-#   args <- c(...)
-#   sum(2^(seq_along(args) - 1) * args)
-# }
+check_ctor <- function(LowerCI, Value, UpperCI, model) {
+  if (!is.numeric(Value)) stop("must be numeric", call. = FALSE)
+  if (!is.numeric(LowerCI)) stop("must be numeric", call. = FALSE)
+  if (!is.numeric(UpperCI)) stop("must be numeric", call. = FALSE)
+  ifelse((LowerCI != as.numeric(Value))
+         && (LowerCI > as.numeric(Value)), stop("LowerCI must be lower than Value", call. = FALSE),NA)
+  ifelse((UpperCI != as.numeric(Value))
+         && (UpperCI < as.numeric(Value)), stop("UpperCI must be higher than Value", call. = FALSE),NA)
+  m <- ifelse(LowerCI == as.numeric(Value) && UpperCI == as.numeric(Value), vwuFixed, model)
+  return(m)
+}
