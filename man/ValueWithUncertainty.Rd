@@ -4,7 +4,15 @@
 \alias{ValueWithUncertainty}
 \title{ValueWithUncertainty}
 \usage{
-ValueWithUncertainty(LowerCI, Value, UpperCI, model = as.numeric, fixed = TRUE)
+ValueWithUncertainty(
+  LowerCI,
+  Value,
+  UpperCI,
+  model = function(v, n = 1) {
+     attr(v, "value")
+ },
+  fixed = TRUE
+)
 }
 \arguments{
 \item{p}{A value to report}
@@ -20,6 +28,7 @@ Returns p with \code{digits} decimal places
 \code{ValueWithUncertainty} returns an object which represents a value with a CI
 }
 \examples{
+
 
 ValueWithUncertainty(1) # returns object
 }

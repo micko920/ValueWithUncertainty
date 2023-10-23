@@ -14,6 +14,3 @@
 \description{
 S3 method for \code{ValueWithUncertainty} objects
 }
-\examples{
-
-}

@@ -12,13 +12,17 @@ test_that("summary methods work properly", {
   xlci <- -1
   xuci <- 100
   x <- ValueWithUncertainty(xlci, xval, xuci)
+  
+  expect_error(any(x,x)>1, "method not supported for `ValueWithUncertainty` objects")
 
   expect_equal(ValueWithUncertaintyMax(x), xuci)
   expect_equal(ValueWithUncertaintyMin(x), xlci)
 
   expect_equal(max(x), xuci)
+  expect_equal(prod(x,x), 1)
+  expect_equal(sum(x,x), 2)
   expect_equal(min(x), xlci)
-
+  
   expect_equal(range(x)[1], xlci)
   expect_equal(range(x)[2], xuci)
 
