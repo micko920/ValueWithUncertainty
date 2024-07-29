@@ -6,7 +6,6 @@
 #' @return Returns string of the value \code{p}
 #' @param digits The number of decimal places
 #' @return Returns p with \code{digits} decimal places
-#' @examples
 #'
 #'
 
@@ -14,20 +13,20 @@
 
 #' ValueWithUncertainty(1) # returns object
 #' @export
-ValueWithUncertainty <- function(LowerCI, Value, UpperCI, model = function(v, n = 1) { attr(v,"value") }, fixed = TRUE) {
-  new_obj <- apply(
-    cbind(LowerCI,Value, UpperCI),1,
-    function(p) {
-      m <- check_ctor(p[[1]],p[[2]],p[[3]],model)
-      if (inherits(p[[2]], "ValueWithUncertainty")) {
-        v <- attr(p[[2]], "value")
-      } else v <- p[[2]]
-      return(list(structure(as.numeric(p[[2]]),
-        value = v,
-        lci = p[[1]], uci = p[[3]], model = m,
-        fixed = fixed, class = "ValueWithUncertainty"
-      )))
-    }
+ValueWithUncertainty <- function(LowerCI, Value, UpperCI, model = as.numeric, fixed = TRUE, name = "default") {
+  if (!is.numeric(Value)) stop("Value must be numeric", call. = FALSE)
+  if (!is.numeric(LowerCI)) stop("LowerCI must be numeric", call. = FALSE)
+  if (!is.numeric(UpperCI)) stop("UpperCI must be numeric", call. = FALSE)
+  if (any(LowerCI > Value)) stop("LowerCI must be lower than Value", call. = FALSE)
+  if (any(UpperCI < Value)) stop("UpperCI must be higher than Value", call. = FALSE)
+  v <- as.numeric(Value)
+  if (inherits(Value, "ValueWithUncertainty")) {
+    v <- attr(Value, "value")
+  }
+  new_obj <- structure(v,
+    value = v,
+    lci = LowerCI, uci = UpperCI, model = model,
+    fixed = fixed, symbol = name, class = "ValueWithUncertainty"
   )
   if (length(new_obj) == 1) return(simplify2array(new_obj)[[1]])
   return(simplify2array(new_obj))
@@ -40,9 +39,10 @@ ValueWithUncertaintyValue <- function(x) UseMethod("ValueWithUncertaintyValue")
 ValueWithUncertaintyValue.ValueWithUncertainty <- function(x) attr(x, "value")
 
 #' @export
-ValueWithUncertaintyValue.list <- function(x, ...) {
-  return (sapply(x,ValueWithUncertaintyValue,simplify = FALSE,...))
-}
+ValueWithUncertaintyName <- function(x) UseMethod("ValueWithUncertaintyName")
+
+#' @export
+ValueWithUncertaintyName.ValueWithUncertainty <- function(x) attr(x, "symbol")
 
 
 #' @export

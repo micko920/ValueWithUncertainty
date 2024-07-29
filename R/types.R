@@ -5,7 +5,6 @@
 #' @inheritParams base::as.numeric
 #'
 #'
-#'
 
 #' @export
 as.double.ValueWithUncertainty <- function(x, ...) {

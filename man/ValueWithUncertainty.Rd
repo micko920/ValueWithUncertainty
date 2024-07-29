@@ -8,10 +8,9 @@ ValueWithUncertainty(
   LowerCI,
   Value,
   UpperCI,
-  model = function(v, n = 1) {
-     attr(v, "value")
- },
-  fixed = TRUE
+  model = as.numeric,
+  fixed = TRUE,
+  name = "default"
 )
 }
 \arguments{
@@ -23,12 +22,9 @@ ValueWithUncertainty(
 Returns string of the value \code{p}
 
 Returns p with \code{digits} decimal places
+
+ValueWithUncertainty(1) # returns object
 }
 \description{
 \code{ValueWithUncertainty} returns an object which represents a value with a CI
-}
-\examples{
-
-
-ValueWithUncertainty(1) # returns object
 }

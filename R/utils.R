@@ -1,6 +1,6 @@
 warn_once <- function(message, fun, type) {
   type <- paste0("ValueWithUncertainty.warn.", type)
-  if (getOption(type)) {
+  if (any(getOption(type))) {
     options(as.list(setNames(FALSE, type)))
     warning("In '", fun, "' : ", message, call. = FALSE)
   }
