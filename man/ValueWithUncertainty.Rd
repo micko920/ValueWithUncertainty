@@ -8,9 +8,10 @@ ValueWithUncertainty(
   LowerCI,
   Value,
   UpperCI,
-  model = as.numeric,
-  fixed = TRUE,
-  name = "default"
+  model = function(v, n = 1) {
+     attr(v, "value")
+ },
+  fixed = TRUE
 )
 }
 \arguments{

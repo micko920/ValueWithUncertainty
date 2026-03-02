@@ -1,4 +1,4 @@
-library(VGAM)
+  library(VGAM)
 
 compare_summary_equal <- function(samples, min, qtr1, med, u, qtr3, max, ...) {
   sample_summary <- stats::quantile(samples)
@@ -62,6 +62,7 @@ test_that("Value ctor", {
 
   expect_silent(ValueWithUncertainty(10, 10, 10))
   expect_silent(ValueWithUncertainty(c(10,0), c(10,0), c(10,0)))
+  
 })
 
 test_that("Value normal numeric", {
@@ -71,6 +72,14 @@ test_that("Value normal numeric", {
   )
   expect_equal(
     typeof(ValueWithUncertainty(0, 1, 10)), "double",
+    ignore_attr = TRUE
+  )
+  expect_equal(
+    mode(ValueWithUncertainty(0, 1, 10)), "numeric",
+    ignore_attr = TRUE
+  )
+  expect_equal(
+    class(ValueWithUncertainty(0, 1, 10)), "ValueWithUncertainty",
     ignore_attr = TRUE
   )
 })
@@ -577,7 +586,18 @@ test_that("Value works with value without uncertainty", {
 
 })
 
-
+test_that("Value works with simple array params", {
+  
+  xval <- 10
+  xlci <- 1
+  xuci <- 100
+  
+  calc_arg <- function() { return(x) }
+  
+  
+  x <- ValueWithUncertainty(c(xlci,xlci), c(xval,xval), c(xuci,xuci), model = rtnRandomSample, fixed = TRUE)
+  expect_equal(as.numeric(x), c(xval,xval))
+})
 
 test_that("Value works with array params", {
 
@@ -635,3 +655,23 @@ test_that("Value works with array params", {
 
 })
 
+test_that("Value array numeric attributes", {
+  expect_equal(
+    sapply(ValueWithUncertainty(c(0,0), c(1,2), c(10,10)),ValueWithUncertaintyValue), c(1,2),
+    ignore_attr = TRUE
+  )
+  expect_equal(
+    typeof(ValueWithUncertainty(c(0,0), c(1,2), c(10,10))), "list",
+    ignore_attr = TRUE
+  )
+  expect_equal(
+    mode(ValueWithUncertainty(c(0,0), c(1,2), c(10,10))), "list",
+    ignore_attr = TRUE
+  )
+  expect_equal(
+    sapply(ValueWithUncertainty(c(0,0), c(1,2), c(10,10)),class), c("ValueWithUncertainty","ValueWithUncertainty"),
+    ignore_attr = TRUE
+  )
+})
+
+  
